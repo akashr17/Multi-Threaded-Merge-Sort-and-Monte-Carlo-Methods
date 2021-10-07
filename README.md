@@ -7,8 +7,7 @@ categories: [labs, threads, multithread, Mergesort]
 usemath: true
 
 ---
-Name: Akashdeep Randhawa
-Github: akashr17
+Name: Akashdeep Randhawa ----- Github: akashr17
 # Lab 2 -- Multi-Threading
 {:.no_toc}
 
