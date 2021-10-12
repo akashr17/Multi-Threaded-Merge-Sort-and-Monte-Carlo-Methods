@@ -8,32 +8,31 @@ namespace MergeSort
     class Program
     {
 
-        private static Queue<int[]> qArray = new Queue<int[]>();
+        
         static void Main(string[] args)
         {
-            Console.WriteLine("Size of Array?");
-            int ARRAY_SIZE = Convert.ToInt32(Console.ReadLine());
+            
+            int ARRAY_SIZE = 1000000;
 
+            //Initialise empty arrays
             int[] arraySingleThread = new int[ARRAY_SIZE];
-
-
-
+            int[] arrayMultiTread = new int[ARRAY_SIZE];
 
             // TODO : Use the "Random" class in a for loop to initialize an array
             Random rand = new Random();
-            int i;
-            for (i = 0; i < ARRAY_SIZE; i++)
+            
+            for (int i = 0; i < ARRAY_SIZE; i++)
             {
                 arraySingleThread[i] = rand.Next(1000);
                 //Console.WriteLine("index {0} = value {1}",i, arraySingleThread[i]);
             }
 
-            // copy array by value.. You can also use array.copy()
-            // int[] arrayMultiThread = arraySingleThread.Slice(0,arraySingleThread.Length);
-            int[] arrayMultiTread = new int[ARRAY_SIZE];
+      
+            // Copy Array values
             Array.Copy(arraySingleThread, arrayMultiTread, ARRAY_SIZE);
             //PrintArray(arraySingleThread);
             //PrintArray(arrayMultiTread);
+
 
             /*TODO : Use the  "Stopwatch" class to measure the duration of time that
                it takes to sort an array using one-thread merge sort and
@@ -42,16 +41,17 @@ namespace MergeSort
 
 
             //TODO :start the stopwatch
-            int[] test = { 4, 4, 5, 8, 2, 2, 5, 4, 9, 7 };
             Stopwatch stopWatch = new Stopwatch();
 
+            // Check the time taken to run the Merge Sort for single thread
             stopWatch.Start();
             int[] sortedArray = MergeSort(arraySingleThread);
             stopWatch.Stop();
 
             TimeSpan ts = stopWatch.Elapsed;
-            //PrintArray(sortedArray);
-            Console.WriteLine("is sorted {0}", IsSorted(sortedArray));
+            
+            // print time taken
+            Console.WriteLine("Single Thread is sorted? {0}", IsSorted(sortedArray));
             Console.WriteLine("Time for single tread is {0}", ts);
 
             //TODO :Stop the stopwatch
@@ -59,20 +59,24 @@ namespace MergeSort
 
 
             //TODO: Multi Threading Merge Sort
-            Console.WriteLine("How many threads?");
-            int numOfThreads = Convert.ToInt32(Console.ReadLine());
+            
+            // State the number of threads wanting to be used
+            int numOfThreads = 4;
 
             Stopwatch stopWatch1 = new Stopwatch();
 
+            // Check the time taken to run the Merge Sort for single thread
             stopWatch1.Start();
             int[] sortedMultiThreadArray = MultiThreadSort(arrayMultiTread, numOfThreads);
             stopWatch1.Stop();
 
             TimeSpan ts1 = stopWatch1.Elapsed;
+
             //PrintArray(sortedMultiThreadArray);
-            Console.WriteLine("is sorted {0}", IsSorted(sortedMultiThreadArray));
+            Console.WriteLine("Multi-Thread is sorted {0}", IsSorted(sortedMultiThreadArray));
             Console.WriteLine("Time for multi tread is {0}", ts1);
 
+            // Print the speed up factor
             Console.WriteLine("Speed up factor is {0}", ts.TotalSeconds / ts1.TotalSeconds);
 
 
@@ -84,6 +88,8 @@ namespace MergeSort
             and constructs a sorted array in the size of combined arrays
             */
         }
+
+        // Method used to take 2 sorted arrays and merge them into 1 large sorted array 
         static int[] Merge(int[] LA, int[] RA, int[] A)
         {
             // TODO :implement
@@ -92,6 +98,8 @@ namespace MergeSort
             int j = 0;
 
                
+            /* loop through the left and right arrays comparing the values of 1 to the other to 
+            determine where they belong in the larger sorted array*/
             while ( i < LA.Length && j < RA.Length)
             {
                         
@@ -109,6 +117,8 @@ namespace MergeSort
                 }
                         
             }
+
+            // place any left over elements in the larger sorted array
             while (i < LA.Length)
             {
                 A[k] = LA[i];
@@ -131,13 +141,16 @@ namespace MergeSort
         implement MergeSort method: takes an integer array by reference
         and makes some recursive calls to intself and then sorts the array
         */
-        static int[] MergeSort(int[] A)
+        static int [] MergeSort(int[] A)
         {
+
+            // if arrays are broken down to just the last element return
             if (A.Length <= 1)
             {
                 return A;
             }
 
+            // determine the midpoint and use that to create the left and right subarrays
             int midpoint = (A.Length)/2;
             int[] left = new int[midpoint];
             int[] right = new int[A.Length-midpoint];
@@ -153,65 +166,81 @@ namespace MergeSort
             //PrintArray(left);
             //PrintArray(right);
 
+            /* recursivly call the mergesort function on left and right array until arrays
+               are split down to just 1 element in each and then begin merging the sorted arrays*/
+
             left = MergeSort(left);
             right = MergeSort(right);
             return (Merge(left, right, A));
+           
               
         }
             
-
+        // Method for the multi threaded sort
         static int[] MultiThreadSort(int [] A, int num)
         {
-            // split recurrsively by taking away length of previous array
-            int subSize = 0;
-            int sum = 0;
-            // 2d array for storing all of the subs
+            // Create a queue to store all of the sorted subarryas
+            Queue<int[]> qArray = new Queue<int[]>();
+
+
+            // jagged array for storing all of the subs
             int[][] sub = new int[num][];
 
             Thread[] t = new Thread[num];
-                
-            int temp = 0;
+
+            int subSize = 0;
+            int sum = 0;
+            
             // populate subarrays
             for (int i = 0; i < num; i++)
             {
-                   
+                /* To determine an equal split of the array into subarrays,
+                there is a loop which determines the subarray size by using the 
+                remaining length of the large array and the remaining number of threads
+                that it needs to be split into */
                 subSize = (A.Length-sum) / (num-i);
                     
                 sub[i] = new int[subSize];
                 Array.Copy(A, sum, sub[i], 0, subSize);
+
                 //PrintArray(sub[temp]);
-                   
                 sum += subSize;
             }
 
+            int temp = 0;
+            /* loop through the num of threads and create a new thread which calls MergeSort for each
+            sub array*/
             for (int i=0; i<num; i++)
             {
+                // using temp variable to ensure i is locked for each loop
                 temp = i;
-                t[temp] = new Thread(() => qArray.Enqueue(MergeSort(sub[temp])));
+                // explicitly re-wrote the sub arrays due to template showing a int [] return for the functions
+                t[temp] = new Thread(() => sub[temp]=MergeSort(sub[temp]));
                 t[temp].Start();
             }
 
+            // loop through the join the threads and place the sub arrays into a queue
             for (int i = 0; i < num; i++)
             {
                 t[i].Join();
+                qArray.Enqueue(sub[temp]);
+
             }
 
-            while (qArray.Count > 1)
+            /* while the queue count is greater than 1 (there is more than 1 sub array in queue,
+            keep looping and taking out 2 arrays to merge them together and then place the larger
+            merged array back into the queue until 1 array left */
+            while (qArray.Count>1)
             {
                 int[] temp1 = qArray.Dequeue();
+
                 int[] temp2 = qArray.Dequeue();
+
                 int[] temp3 = new int[temp1.Length + temp2.Length];
                 Merge(temp1, temp2, temp3);
                 qArray.Enqueue(temp3);
             }
             return qArray.Dequeue();
-        }
-
-        static void multi(int [] a)
-        {
-            //MergeSort(a);
-            //PrintArray(a);
-            qArray.Enqueue(MergeSort(a));
         }
 
         // a helper function to print your array
