@@ -7,9 +7,51 @@ categories: [labs, threads, multithread, Mergesort]
 usemath: true
 
 ---
-Name: Akashdeep Randhawa ----- Github: akashr17
+### Name: Akashdeep Randhawa  
+### Github: akashr17
 # Lab 2 -- Multi-Threading
 {:.no_toc}
+
+# Questions  
+
+## Part 1 Questions:  
+1) The table below summerizes the times taken by the single thread and multi-threaded implementations for the various Array sizes. For this test, I kept the number of threads as a constant 4 for all of them.  
+
+| Array Size | Single Thread Time | Multi-Thread Time | Speed-Up Factor |
+|------------|--------------------|-------------------|-----------------|
+| 10         | 0.000410           | 0.03725           | 0.01100         |
+| 100        | 0.000446           | 0.06495           | 0.00687         |
+| 1,000      | 0.000675           | 0.06619           | 0.01020         |
+| 10,000     | 0.003394           | 0.12357           | 0.02746         |
+| 100,000    | 0.041339           | 0.09180           | 0.45033         |
+| 1,000,000  | 0.366911           | 0.19944           | 1.83974         |
+| 10,000,000 | 3.757105           | 1.35482           | 2.77313         |  
+2) Based on the number of processors (4 for my computer) I was expecting close to 4x speed up and for the array sizes larger than 10 million, I was getting close to that.  
+3) I did not acheieve the speed up expected and I believe this is due to the overhead that comes along with creating this implementation of multi-threading. But as you increase the array sizes, the relative overhead compared to the efficiecy of multi-thread is getting smaller and you can see the speed up factor growing.  
+4) The table below summerizes the speed up factor based on the number of threads being used. At thread count 4, the speed up factor is the greatest and 4 equates to the number of processors my laptop has. The speed up factor graph follows the general shape an upside down parabola with thread count 4 being at the apex and the decline in speed factor after 4 being slower than the increase of the speed up factor leading up to 4.  
+
+
+| Number of Threads | 1      | 2      | 3      | 4      | 5      | 6      | 7      | 8      | 9      | 10     |
+|-------------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
+| Speed-Up Factor   | 1.0115 | 1.5744 | 1.6743 | 1.8564 | 1.7902 | 1.6507 | 1.5320 | 1.4339 | 1.5339 | 1.2999 |  
+  
+  ![image](https://user-images.githubusercontent.com/44417086/136886312-8d5ab73a-c6a1-437e-8114-93d33dce42fd.png)
+  
+_________________________________________________________________________________________________________________  
+## Part 2 Question:  
+1) When spliting up code into multi thread, the first thing I overlooked in both parts was keeping tracking of odd number of divisions between the threads, if this is not handled properly, it could lead to you missing out on or cutting off important information from the original message. Also, ensuring that any shared data dependacies are dealt with properly was very imporant, for example, ensuring that the hits was locked was important becaue all of the threads were acessing and changing that variable. If you had not locked it, some interation of the hits could've been repeated and not updated the correct amount.  
+2) When designing concurrent code, it's important to keep track of the potential issues that could rise due to shared data resources and I had to keep track of this using various test cases and print statements to ensure it was working properly.  
+3) I don't believe this method is efficent at estimating PI to great accuracy because it requires such a large sample size to have good accurancy and this is large sample size is often pushing the boundaries of the varaiable types such as long. If you use smaller sample sizes than there is quite a bit of variation in the results you receive every time. I would get you need 10^9 or 10^10 to get 7 decimal sports accurate consistantly using this method.  
+
+Also, with 10^7 samples, the estimation of pi was consistantly accurate to 3 decimal places using the multi-threading.  
+Below is the table summerizing the speed up factor of a single-thread and a multi-thread (use thread# = number of cores on your machine) as a funtion of the sample size.  
+| Sample Size     | 1,000   | 10,000  | 100,000 | 1,000,000 | 10,000,000 | 100,000,000 |
+|-----------------|--------|--------|--------|---------|----------|-----------|
+| Speed-Up Factor | 0.0145 | 0.0323 | 0.2242 | 1.2812  | 2.4671   | 4.2441    |  
+
+It becomes worth it to use multi-threading when sample size is greater than 10^6.  
+# END OF QUESTIONS
+------------------------------------------------------------------------------------------
 
 In this lab, we will get some practice with creating threads and applying concurrency effectively in C\#.  
 
